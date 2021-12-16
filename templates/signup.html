@@ -1,0 +1,16 @@
+{% extends "index.html" %}
+
+{% block main_content %}
+<h1>Sign up</h1>
+
+<form method="POST" action=""> 
+    <label for="username"> your name: </label>
+    <input type="text" name="username">
+    <label for="password1"> your password: </label>
+    <input type="text" name="password1">
+    <label for="password2"> please enter the password again: </label>
+    <input type="text" name="password2">
+    <input type="submit">
+</form>
+
+{% endblock %}

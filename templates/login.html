@@ -1,0 +1,14 @@
+{% extends "index.html" %}
+
+{% block main_content %}
+<p>Please Log in or <a href="{{ url_for('signup') }}">sign up</a> if you don't have an account.</p>
+
+<form method="POST" action=""> 
+    <label for="username"> your name: </label>
+    <input type="text" name="username">
+    <label for="password"> your password: </label>
+    <input type="text" name="password">
+    <input type="submit">
+</form>
+
+{% endblock %}

@@ -1,0 +1,36 @@
+{% extends "index.html" %}
+
+{% block main_content %}
+<div class="container" style="width:40%; align-items: center; margin-top: 5%;border-style: solid; border-color: black; font-size: larger;text-align: center;">
+<form style="margin-top:20px;" method='post' action="/newAccount">
+    <div class="form-group">
+        <label for="type">Account Type:</label>
+        <select name="type" id="type">
+        <option value="checking">Checking</option>
+        <option value="saving">Saving</option>
+        </select>
+    </div>
+
+    <br>
+    <div class="form-group">
+    <textarea style="width:300px;height: 400px;font-size: medium" readonly>
+There are four operation for each account:
+Deposit money; Withdraw money; Transfer money; Delete account.
+
+Any of these operation can be performed on a checking account at any time.
+The interest rate for a checking account is 10% per month.
+Only depositing money can be performed on a saving account at any time, the rest operation can be performed only at weekends.
+The interest rate for a saving account is 20% per month.
+    </textarea>
+
+    <label for="agree">I agree to the term of use</label>
+    <input name="agree" id="agree" type="checkbox" required>
+    </div>
+
+    <br>
+    <input type="submit" value="Create Account" style="margin-bottom:20px;">
+
+  </form>
+</div>
+
+{% endblock %}

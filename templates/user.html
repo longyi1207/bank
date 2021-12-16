@@ -1,0 +1,242 @@
+{% extends "index.html" %}
+
+{% block main_content %}
+
+<div class="container" id="main-container" style="margin-top:5%;">
+   <div class="row" style="margin-left:20%; margin-right:20%;">
+      {% for account in accounts %}
+      <div class="col-lg-6 md-12">
+         <div class="card shadow-lg" style="border-radius: 10px; margin-bottom: 30px;">
+             <button class="uuidButton" data-uuid="{{account.uuid}}" data-toggle="modal" data-target="#uuidModal" style="position: absolute;color:lightgray ;top: 0px;left: 0px; outline: none;border: none;background-color: transparent;">UUID </button>
+             <button class="deleteButton" data-account="{{account.id}}" data-toggle="modal" data-target="#deleteModal" style="position: absolute;color:lightgray ;top: 0px;right: 0px; outline: none;border: none;background-color: transparent;">X </button>
+            <div class="card-title" style="margin-top:20px; text-align: center;">
+               
+               <h3>{{account.type}} account</h3>
+               <h5 style="color:#bcdae4;"> Balance: {{account.money}}$ </h5>
+            </div>
+            <div class="card-body">
+               <div class="row" style="margin-left:20px;margin-right:20px;">
+                  <button type="button" data-account="{{account.id}}" data-toggle="modal" data-target="#depositModal" class="depositButton button col-lg-5 md-12 shadow-lg" style="border-radius:20px; text-align: center;margin-top:20px;" title="deposit"> <i class="bi-piggy-bank" style="font-size:60px;"></i></button>
+                  <div class="col-lg-2"></div>
+                  <button type="button" data-account="{{account.id}}" data-toggle="modal" data-target="#withdrawModal" class="withdrawButton button col-lg-5 md-12 shadow-lg" style="border-radius:20px; text-align: center;margin-top:20px;" title="withdraw"> <i class="bi-cash-stack" style="font-size:50px;"></i></button>
+                  <button type="button" data-account="{{account.id}}" data-toggle="modal" data-target="#transferModal" class="transferButton button col-lg-5 md-12 shadow-lg" style="border-radius:20px; text-align: center;margin-top:20px;" title="transfer"> <i class="bi-arrow-left-right" style="font-size:50px;"></i></button>
+                  <div class="col-lg-2"></div>
+                  <button type="button" data-account="{{account.id}}" data-toggle="modal" data-target="#historyModal" class="historyButton button col-lg-5 md-12 shadow-lg" style="border-radius:20px; text-align: center;margin-top:20px" title="history"> <i class="bi-graph-up" style="font-size:50px;"></i> </button>
+               </div>
+            </div>
+         </div>
+      </div>
+      {% endfor %}
+      <div class="col-lg-6 md-12">
+         <a href="/newAccount">
+         <div class="card shadow-lg" style="border-radius: 10px;padding-top: 100px;min-height: 400px;">
+            <i class="bi-plus-square-dotted align-self-center" style="font-size:80px;"></i>
+         </div>
+        </a>
+      </div>
+   </div>
+</div>
+
+
+<!-- deposit modal -->
+<div class="modal" id="depositModal" tabindex="-1" role="dialog">
+   <div class="modal-dialog" role="document">
+     <div class="modal-content">
+       <div class="modal-header">
+         <h5 class="modal-title">Deposit money</h5>
+         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+           <span aria-hidden="true">&times;</span>
+         </button>
+       </div>
+       <div class="modal-body">
+         <form method='POST'>
+            <label for="amount">Money amount</label>
+            <br>
+            <input type="number" name="amount" required> $
+            <br><br>
+            <label for="password">User password</label>
+            <br>
+            <input type="text" name="password" required>
+            <br><br>
+            <button type="submit" class="btn btn-primary">Deposit</button>
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+         </form>
+       </div>
+     </div>
+   </div>
+ </div>
+
+
+<!-- withdraw modal -->
+<div class="modal" id="withdrawModal" tabindex="-1" role="dialog">
+   <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Withdraw money</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form method='POST'>
+             <label for="amount">Money Amount</label>
+             <br>
+             <input type="number" name="amount" required> $
+             <br><br>
+             <label for="password">User password</label>
+             <br>
+             <input type="text" name="password" required>
+             <br><br>
+             <button type="submit" class="btn btn-primary">Withdraw</button>
+             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          </form>
+        </div>
+      </div>
+    </div>
+ </div>
+
+
+ <!-- transfer modal -->
+<div class="modal" id="transferModal" tabindex="-1" role="dialog">
+   <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Transfer money</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form method='POST'>
+             <label for="deposit">Money Amount</label>
+             <br>
+             <input type="number" name="amount" required> $
+             <br>
+             <label for="uuid">UUID of recipient (can be found on top left corner of accounts. Transfer can be made within or between user accounts)</label>
+             <br>
+             <input type="text" name="uuid" required>
+             <br><br>
+             <label for="password">User password</label>
+             <br>
+             <input type="text" name="password" required>
+             <br><br>
+             <button type="submit" class="btn btn-primary">Transfer</button>
+             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          </form>
+        </div>
+      </div>
+    </div>
+ </div>
+
+
+ <!-- history modal -->
+<div class="modal" id="historyModal" tabindex="-1" role="dialog">
+   <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Transaction history</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+            <textarea>
+
+            </textarea>
+        </div>
+      </div>
+    </div>
+ </div>
+
+
+ <!-- uuid modal -->
+ <div class="modal" id="uuidModal" tabindex="-1" role="dialog">
+   <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+         <h5>Account uuid:</h5>
+         <p></p>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+      </div>
+    </div>
+ </div>
+
+
+ <!-- delete account -->
+ <div class="modal" id="deleteModal" tabindex="-1" role="dialog">
+   <div class="modal-dialog" role="document">
+      <div class="modal-content">
+         <div class="modal-header">
+            <h5 class="modal-title" id="deleteModelLabel">Delete Account</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+            </button>
+         </div>
+         <div class="modal-body">
+            <form method='POST'>
+               <label for="uuid">UUID of this account (can be found on top left corner of accounts.)</label>
+               <br>
+               <input type="text" name="uuid" required>
+               <br><br>
+               <label for="password">User password</label>
+               <br>
+               <input type="text" name="password" required>
+               <br><br>
+               <div class="modal-footer">
+                  <p>Are you sure you want to delete account? </p>
+                  <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
+                  <button type="submit" class="btn btn-danger">Yes</button>
+               </div>
+            </form>
+         </div>
+      </div>
+   </div>
+ </div>
+
+
+ <!-- bootstrap -->
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+
+
+<!-- jquery -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+<script>
+   $(".depositButton").click( function () {
+      url = "/user/deposit/"+$(this).data('account')
+      $("#depositModal form").attr("action",url)
+   });
+
+   $(".withdrawButton").click( function () {
+      url = "/user/withdraw/"+$(this).data('account')
+      console.log(url)
+      $("#withdrawModal form").attr("action",url)
+   });
+
+   $(".transferButton").click( function () {
+      url = "/user/transfer/"+$(this).data('account')
+      $("#transferModal form").attr("action",url)
+   });
+
+   $(".historyButton").click( function () {
+      url = "/user/history/"+$(this).data('account')
+      $("#historyModal form").attr("action",url)
+   });
+
+   $(".uuidButton").click( function () {
+      $("#uuidModal p").text($(this).data('uuid'))
+   });
+
+   $(".deleteButton").click( function () {
+      url = "/user/delete/"+$(this).data('account')
+      console.log(url)
+      $("#deleteModal form").attr("action",url)
+   });
+
+</script>
+
+{% endblock %}

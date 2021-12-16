@@ -1,0 +1,17 @@
+LICENSE
+MANIFEST.in
+README.rst
+setup.cfg
+setup.py
+queries/__init__.py
+queries/pool.py
+queries/results.py
+queries/session.py
+queries/tornado_session.py
+queries/utils.py
+queries.egg-info/PKG-INFO
+queries.egg-info/SOURCES.txt
+queries.egg-info/dependency_links.txt
+queries.egg-info/requires.txt
+queries.egg-info/top_level.txt
+queries.egg-info/zip-safe
