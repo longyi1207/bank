@@ -1,10 +1,11 @@
 from flask import (Flask, render_template, url_for, redirect, request, flash, session)
 from flask_cors import CORS
 from model import setup_db, User, Account
-from datetime import datetime
 import bcrypt
 import random
 import uuid
+import atexit
+from apscheduler.schedulers.background import BackgroundScheduler
 
 app = Flask(__name__)
 setup_db(app)
@@ -70,7 +71,7 @@ def login():
         session['username'] = username
         session['id'] = user.id
         session['logged_in'] = True
-        return redirect( url_for('user', userId = user.id) )
+        return redirect_()
 
 
 @app.route('/newAccount', methods=["GET", "POST"])
@@ -79,14 +80,19 @@ def createAccount():
         return render_template("create_account.html")
     else:
         type = request.form.get('type')
-        account = Account(type=type, money=0, uuid=str(uuid.uuid4())[:8], user_id=session['id'])
-        account.insert()
-        return redirect(url_for('user', userId=session['id']))
+        if 'id' not in session:
+            return redirect_()
+        else:
+            account = Account(type=type, money=0, uuid=str(uuid.uuid4())[:8], user_id=session['id'])
+            account.insert()
+            account.updateHistory("create account")
+        return redirect_()
 
 
 @app.route('/user/<userId>', methods=["GET", "POST"])
 def user(userId):
     accounts = Account.query.filter_by(user_id=userId).order_by(Account.id.desc())
+    print(accounts)
     return render_template('user.html',accounts=accounts)
 
 
@@ -101,12 +107,13 @@ def deposit(accountId):
     hashed2_str = hashed2.decode('utf-8')
     if hashed2_str != stored:
         flash('Wrong password')
-        return redirect(url_for("user",userId=session['id']))
+        redirect_()
 
-    account.deposit(int(request.form.get("amount")))
-    # account.updatehistory("deposit {}$")
+    amount = int(request.form.get("amount"))
+    account.deposit(amount)
+    account.updateHistory("deposit {}$".format(amount))
     flash("deposit successfully")
-    return redirect(url_for('user', userId=session['id']))
+    return redirect_()
 
 
 @app.route('/user/withdraw/<accountId>', methods=["POST"])
@@ -120,14 +127,15 @@ def withdraw(accountId):
     hashed2_str = hashed2.decode('utf-8')
     if hashed2_str != stored:
         flash('Wrong password')
-        return redirect(url_for("user",userId=session['id']))
+        return redirect_()
 
-    if account.withdraw(int(request.form.get("amount"))):
-        # account.updatehistory("deposit {}$")
+    amount = int(request.form.get("amount"))
+    if account.withdraw(amount):
+        account.updateHistory("withdraw {}$".format(amount))
         flash("deposit successfully")
     else:
         flash("not enough balance")
-    return redirect(url_for('user', userId=session['id']))
+    return redirect_()
 
 
 @app.route('/user/transfer/<accountId>',methods=["POST"])
@@ -141,23 +149,29 @@ def transfer(accountId):
     hashed2_str = hashed2.decode('utf-8')
     if hashed2_str != stored:
         flash('Wrong password')
-        return redirect(url_for("user",userId=session['id']))
+        return redirect_()
     
     uuid = request.form.get("uuid")
     toAccount = Account.query.filter_by(uuid=uuid).one_or_none()
     if toAccount is None:
         flash('Destination account does not exists')
-        return redirect(url_for("user",userId=session['id']))
+        redirect_()
     
     amount = int(request.form.get("amount"))
     if not fromAccount.withdraw(amount):
         flash("not enough balance")
 
     toAccount.deposit(amount)
-    # fromAccount.updateHistory()
-    # toAccount.updateHistory()
+    fromAccount.updateHistory("transfer {}$ to account {}".format(amount,uuid))
+    toAccount.updateHistory("receive {}$ from account {}".format(amount,fromAccount.uuid))
     flash("transfer successfully")
-    return redirect(url_for("user",userId=session['id']))
+    return redirect_()
+
+
+@app.route('/user/history/<accountId>')
+def history(accountId):
+    account = Account.query.get(accountId)
+    return account.history
 
 
 @app.route('/user/delete/<accountId>',methods=["POST"])
@@ -171,21 +185,45 @@ def delete(accountId):
     hashed2_str = hashed2.decode('utf-8')
     if hashed2_str != stored:
         flash('Wrong password')
-        return redirect(url_for("user",userId=session['id']))
+        return redirect_()
     
     uuid = request.form.get("uuid")
     account = Account.query.filter_by(uuid=uuid).one_or_none()
     if account is None:
         flash('Wrong uuid')
-        return redirect(url_for("user",userId=session['id']))
+        return redirect_()
     
     if account.money > 0:
         flash('There is still money in account, please withdraw or transfer them')
-        return redirect(url_for("user",userId=session['id']))
+        return redirect_()
 
     account.delete()
     flash("delete successfully")
-    return redirect(url_for("user",userId=session['id']))
+    return redirect_()
+
+
+def gain_interest():
+    for account in Account.query.all():
+        if account.type == "checking":
+            amount = account.money * 0.5
+        else:
+            amount = account.money * 1
+        account.deposit(amount)
+        account.updateHistory("Gain {}$ Interest".format(amount))
+    return redirect_()
+
+
+def redirect_():
+    if 'id' in session:
+        return redirect(url_for('user', userId=session['id']))
+    else:
+        return redirect(url_for('login'))
+
+
+scheduler = BackgroundScheduler()
+scheduler.add_job(func=gain_interest, trigger="interval", seconds=60)
+scheduler.start()
+atexit.register(lambda: scheduler.shutdown())
 
 
 if __name__ == '__main__':

@@ -1,7 +1,6 @@
-import os
-from sqlalchemy import Column, String, Integer
+from sqlalchemy import Column, String
 from flask_sqlalchemy import SQLAlchemy
-import json
+import time
 
 database_name = "bank"
 database_path = "postgresql://{}/{}".format('localhost:5432', database_name)
@@ -44,7 +43,7 @@ class Account(db.Model):
     type = db.Column(String(10), nullable=False)
     money = db.Column(db.Integer)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    history = db.Column(String(1000))
+    history = db.Column(String(10000))
 
     def insert(self):
         db.session.add(self)
@@ -60,7 +59,6 @@ class Account(db.Model):
     def deposit(self,i):
         self.money += i
         self.update()
-        self.updateHistory("deposit {}$".format(i))
     
     def withdraw(self,i):
         if i <= self.money:
@@ -71,4 +69,8 @@ class Account(db.Model):
             return False
 
     def updateHistory(self,s):
-        return
+        if self.history is None:
+             self.history = (s + " at " + time.strftime("%A, %d. %B %Y %I:%M:%S %p") + ";")
+        elif len(self.history)<900:
+            self.history += (s + " at " + time.strftime("%A, %d. %B %Y %I:%M:%S %p") + ";")
+        self.update()
