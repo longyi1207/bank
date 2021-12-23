@@ -8,4 +8,4 @@ You can perform six operations on any account: check account uuid, delete accoun
 use terminal to cd into "bank" directory
 use command "pip3 install -r requirements.txt" to install dependencies
 use command "python3 app.py" to run app
-if run successfully, you will see something like Running on http://127.0.0.1:5000/ (Press CTRL+C to quit), open the address on browser
+if run successfully, you will see something like "Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)", open the address on browser
