@@ -15,12 +15,7 @@ app.secret_key = ''.join([ random.choice(('ABCDEFGHIJKLMNOPQRSTUVXYZ' +'abcdefgh
 
 @app.route('/')
 def index():
-    if 'id' in session:
-        id = session['id']
-        return redirect(url_for('user', userId=id) )
-    
-    else:
-        return redirect(url_for('login'))        
+    return redirect_()   
 
 
 @app.route('/signup/', methods=["GET", "POST"])
@@ -89,10 +84,10 @@ def createAccount():
         return redirect_()
 
 
-@app.route('/user/<userId>', methods=["GET", "POST"])
-def user(userId):
+@app.route('/user', methods=["GET", "POST"])
+def user():
+    userId = session['id']
     accounts = Account.query.filter_by(user_id=userId).order_by(Account.id.desc())
-    print(accounts)
     return render_template('user.html',accounts=accounts)
 
 
@@ -107,7 +102,7 @@ def deposit(accountId):
     hashed2_str = hashed2.decode('utf-8')
     if hashed2_str != stored:
         flash('Wrong password')
-        redirect_()
+        return redirect_()
 
     amount = int(request.form.get("amount"))
     account.deposit(amount)
@@ -155,11 +150,11 @@ def transfer(accountId):
     toAccount = Account.query.filter_by(uuid=uuid).one_or_none()
     if toAccount is None:
         flash('Destination account does not exists')
-        redirect_()
+        return redirect_()
     
     amount = int(request.form.get("amount"))
     if not fromAccount.withdraw(amount):
-        flash("not enough balance")
+        return flash("not enough balance")
 
     toAccount.deposit(amount)
     fromAccount.updateHistory("transfer {}$ to account {}".format(amount,uuid))
@@ -204,18 +199,18 @@ def delete(accountId):
 
 def gain_interest():
     for account in Account.query.all():
-        if account.type == "checking":
-            amount = account.money * 0.5
-        else:
-            amount = account.money * 1
-        account.deposit(amount)
-        account.updateHistory("Gain {}$ Interest".format(amount))
-    return redirect_()
+        if account.money < 1000000000:
+            if account.type == "checking":
+                amount = account.money * 0.5
+            else:
+                amount = account.money * 1
+            account.deposit(amount)
+            account.updateHistory("Gain {}$ Interest".format(amount))
 
 
 def redirect_():
     if 'id' in session:
-        return redirect(url_for('user', userId=session['id']))
+        return redirect(url_for('user'))
     else:
         return redirect(url_for('login'))
 
