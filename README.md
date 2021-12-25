@@ -11,4 +11,4 @@ use command "python3 app.py" to run app
 if run successfully, you will see something like "Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)", open the address on browser
 
 SCREENSHOT:
-![alt text](https://github.com/longyi1207/recipe/blob/main/screenshot.jpg?raw=true)
+![alt text](https://github.com/longyi1207/bank/blob/main/screenshot.jpg?raw=true)
