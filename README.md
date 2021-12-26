@@ -12,3 +12,6 @@ if run successfully, you will see something like "Running on http://127.0.0.1:50
 
 SCREENSHOT:
 ![alt text](https://github.com/longyi1207/bank/blob/main/screenshot.jpg?raw=true)
+
+VIDEO:
+https://www.youtube.com/watch?v=IIh99Ps105U&t=395s
